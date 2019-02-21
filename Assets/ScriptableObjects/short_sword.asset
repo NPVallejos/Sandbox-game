@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75834a8dc80d15948b3987f965af477b, type: 3}
+  m_Name: short_sword
+  m_EditorClassIdentifier: 
+  weapon: 1
+  tool: 1
+  block: 0
+  material: 1
+  id: short_sword
+  total: 1
+  sprArr: []
+  function: 2
+  tier: 0
+  power: 0
+  physicalDmg: 0
+  magicalDmg: 0
+  effect: none

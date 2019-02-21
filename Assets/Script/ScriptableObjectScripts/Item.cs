@@ -24,30 +24,41 @@ using UnityEngine;
 // However, there do exist tools that aren't weapons:
 // 	 - A paint brush is a Tool but not a Weapon
 [System.Serializable]
-public class Item {
+[CreateAssetMenu(fileName = "New Item", menuName = "Item")]
+public class Item : ScriptableObject {
 	public bool weapon, tool, block, material;
 
 	// Within all items
 	public string id;
 	public short total;
-	public Sprite[] sp_arr;
+	public Sprite[] sprArr;
 	public Item() {
 		id = "";
 		total = 0;
-		sp_arr = null;
+		sprArr = null;
 	}
-	public Item(string id, short total, Sprite[] sp_arr) {
+	public Item(string id, short total, Sprite[] sprArr) {
 		this.id = id;
 		this.total = total;
-		this.sp_arr = sp_arr;
+		this.sprArr = sprArr;
 	}
 
 	// Functions for NaturalMaterial class:
 	// Functions for Block class:
 	// Functions for Tool class:
+	public virtual void mine() {
+		Debug.Log("N/A");
+	}
+	public virtual void chop() {
+		Debug.Log("N/A");
+	}
 	// Functions for Weapon class:
 	public virtual void attack() {
 		Debug.Log("N/A");
+	}
+
+	public virtual void toString() {
+		Debug.Log("id=" + id + "|total=" + total);
 	}
 }
 

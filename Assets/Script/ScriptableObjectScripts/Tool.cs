@@ -32,17 +32,29 @@ using UnityEngine;
 // Miscellaneous stuff like a paint brush
 // However, fishing rods (for example) should be tiered so lets leave this here
 [System.Serializable]
+[CreateAssetMenu(fileName = "New Tool", menuName = "Tool")]
 public class Tool : NaturalMaterial {
 	public short function;
 	public short tier;
-	public Tool()
-	: base() {
+	public short power;
+	public Tool() {
+	//: base() {
 		function = 0;
 		tier = 0;
 	}
-	public Tool(string id, short total, Sprite[] sp_arr, short function, short tier)
+	public Tool(string id, short total, Sprite[] sp_arr, short function, short tier) 
 	: base(id, total, sp_arr) {
 		this.function = function;
 		this.tier = tier;
+	}
+	public override void mine() {
+		Debug.Log("Mined!");
+	}
+	public override void chop() {
+		Debug.Log("Chopped!");
+	}
+	public override void toString() {
+		base.toString();
+		Debug.Log("function=" + function + "|tier=" + tier);
 	}
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// Main Purpose:
+// - Handles everything that involves building, mining, attacking, and inventory management
 public class Builder : MonoBehaviour
 {
     private Vector2 mousePosition;
@@ -17,7 +19,7 @@ public class Builder : MonoBehaviour
     private Vector3 playerPos;
     private bool canBuild;
     private bool canPlace;
-    private bool canDestroy;
+    private bool canMine;
 
     public GameObject templateObject; // TODO: Grab template object from prefab folder
     private Vector3 templateObjPos;
@@ -26,20 +28,8 @@ public class Builder : MonoBehaviour
     private SpriteRenderer sprRend;
 
     public Inventory inventory;
-    public short currentItem;
-    private Weapon wp = new Weapon("axe", 2, null, 0, 1, 3, 3, "fire");
 
-    void Awake()
-    {
-        currentItem = 0;
-        inventory.Add(wp);
-        inventory.Add(wp);
-        inventory.Get(currentItem).attack();
-        inventory.Get(++currentItem).attack();
-
-        canBuild = true;
-        canPlace = false;
-
+    void Awake() {
         cam = Camera.main;
         buildBoxCol = GetComponent<BoxCollider2D>();
         templateObjCol = templateObject.GetComponent<BoxCollider2D>();
@@ -52,11 +42,24 @@ public class Builder : MonoBehaviour
             buildDimensions = new Vector3(buildBoxCol.bounds.size.x * 0.5f, buildBoxCol.bounds.size.y * 0.5f, 0f);
     }
 
+    void Start() {
+        canBuild = true;
+        canPlace = false;
+        inventory.reset();
+    }
+
     public void Update() // TODO: Make a dynamic object pooling system
     {
         mousePosition = Input.mousePosition;
         playerPos = player.transform.position;
         displayTemplateObject();
+
+        if(Input.GetAxis("Mouse ScrollWheel") > 0) {
+            inventory.cycleUp();
+        }
+        if(Input.GetAxis("Mouse ScrollWheel") < 0) {
+            inventory.cycleDown();
+        }
     }
 
     public void FixedUpdate()
@@ -64,7 +67,7 @@ public class Builder : MonoBehaviour
         if (Input.GetButton("Fire1"))
             placeObject();
         if (Input.GetButton("Fire2"))
-            destroyObject();
+            mineObject();
     }
 
     public void displayTemplateObject()
@@ -78,11 +81,11 @@ public class Builder : MonoBehaviour
             if(!inBuildBoundary()) {
                 templateObject.transform.position = new Vector3(0, 0, cam.transform.position.z);  // Hides the template object
                 canPlace = false;
-                canDestroy = false;
+                canMine = false;
             }
             else {
                 templateObject.transform.position = new Vector3((int)templateObjPos.x, (int)templateObjPos.y, 0f); // Otherwise we can display the template object
-                canDestroy = true; // Now we cannot set canDestroy to true just yet; we need to know what item the player is currently holding
+                canMine = true;
             }
         }
     }
@@ -103,14 +106,10 @@ public class Builder : MonoBehaviour
         return true;
     }
 
-    // So now we need an inventory system where we keep track of the current inventory index
-    // As well as the current shortcut items
-    // So we need an inventory filled with prefabs whose layer is 8
     public void placeObject()
     {
         checkRays();
-        //Debug.Log(canBuild + " : " + canPlace);
-        if (canBuild && canPlace) //&& inv.getTotal() > 0 && inv.placeableObj())
+        if (canBuild && canPlace && inventory.isBlock()) //&& inv.getTotal() > 0 && inv.placeableObj())
         {
             sprRend.color = new Color(1f, 1f, 1f, 1f);
             //currentObject.layer = currentObjMask;
@@ -123,15 +122,13 @@ public class Builder : MonoBehaviour
         }
     }
 
-    public void destroyObject()
+    public void mineObject()
     {
         checkRays();
-        if (canBuild && canDestroy) // && inv.getObjName() == "picaxe_wood")
+        if (canBuild && canMine && inventory.checkItemFunction(0)) // && inv.getObjName() == "picaxe_wood")
         {
-            // TODO: destroy the object that has this collider
-            Object.Destroy(outRays[4].collider.gameObject);
-            //inv.incrementItemCount(outRays[4].collider.gameObject.name);
-            //inventoryCount[0].text = inv.toString();
+            // See Singleton.cs for more details on dealDamage()
+            outRays[4].collider.gameObject.GetComponent<Singleton>().dealDamage(inventory.getToolPower());
         }
     }
 
@@ -191,7 +188,7 @@ public class Builder : MonoBehaviour
                 if (i < 4)
                     canPlace = true;
                 else if (i == 4)
-                    canDestroy = true;
+                    canMine = true;
                 else
                     canPlace = false;
             }
@@ -199,7 +196,7 @@ public class Builder : MonoBehaviour
             else {
                 // And its the ray that detects another block...
                 if(i == 4)
-                    canDestroy = false;
+                    canMine = false;
             }
         }
     }
