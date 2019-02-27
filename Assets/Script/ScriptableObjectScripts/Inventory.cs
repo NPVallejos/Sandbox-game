@@ -71,4 +71,10 @@ public class Inventory : ScriptableObject {
     public short getToolPower() {
         return ((Tool)inv[currentItem]).power;
     }
+    //--------------------------------------------------------------------------
+    // UI Specific Functions
+    public void setCurrentItem(int c) {
+        if(c < inv.Count)
+            currentItem = c;
+    }
 }

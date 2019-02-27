@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour {
-    /* 
+    /*
      small: probability = 72  | neighbor threshold : 55
      medium: probability = 75 | neighbor Threshold : 51
      large: probability = 75 | neighbor Threshold : 51
@@ -108,7 +108,7 @@ public class WorldGenerator : MonoBehaviour {
             {
                 if(map[x,y] == 1)
                 {
-                    Object.Instantiate(prefabList[0], new Vector3(x, y, 0f), new Quaternion(0, 0, 0, 0));
+                    Object.Instantiate(prefabList[0], new Vector3(x, y, 90f), new Quaternion(0, 0, 0, 0));
                 }
             }
         }
