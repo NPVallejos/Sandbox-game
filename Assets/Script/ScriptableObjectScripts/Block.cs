@@ -13,12 +13,13 @@ public class Block : NaturalMaterial {
 	public short health;
 
 	public bool dealDamage(short dmg) {
-		health -= dmg;
 		if(health > 0) {
-			return true;
+			health -= dmg;
 		}
-		health = 0;
-		return false;
+		if(health == 0) {
+			return false;
+		}
+		return true;
 	}
 
 	public Block() {

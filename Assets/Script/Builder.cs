@@ -24,10 +24,11 @@ public class Builder : MonoBehaviour
     public GameObject templateObject; // TODO: Grab template object from prefab folder
     private Vector3 templateObjPos;
     private BoxCollider2D templateObjCol;
-    private RaycastHit2D[] outRays;
     private SpriteRenderer sprRend;
 
     public Inventory inventory;
+    public IEnumerator mineCoroutine;
+    private GameObject currentSingleton;
 
     void Awake() {
         cam = Camera.main;
@@ -45,6 +46,8 @@ public class Builder : MonoBehaviour
     void Start() {
         canBuild = true;
         canPlace = false;
+        mineCoroutine = null;
+        currentSingleton = null;
         inventory.reset();
     }
 
@@ -60,14 +63,24 @@ public class Builder : MonoBehaviour
         if(Input.GetAxis("Mouse ScrollWheel") < 0) {
             inventory.cycleDown();
         }
+        if (Input.GetButtonDown("Fire2")) {
+            if(mineCoroutine != null) {
+                StopCoroutine(mineCoroutine);
+                Debug.Log("Stopped & Replaced Coroutine");
+            }
+
+            mineCoroutine = mineObject();
+            StartCoroutine(mineCoroutine);
+            Debug.Log("Started Coroutine");
+        }
     }
 
     public void FixedUpdate()
     {
         if (Input.GetButton("Fire1"))
             placeObject();
-        if (Input.GetButton("Fire2"))
-            mineObject();
+        // if(Input.GetButton("Fire2"))
+        //     checkRays();
     }
 
     public void displayTemplateObject()
@@ -122,20 +135,40 @@ public class Builder : MonoBehaviour
         }
     }
 
-    public void mineObject()
+    public IEnumerator mineObject()
     {
-        checkRays();
-        if (canBuild && canMine && inventory.checkItemFunction(0)) // && inv.getObjName() == "picaxe_wood")
-        {
-            // See Singleton.cs for more details on dealDamage()
-            outRays[4].collider.gameObject.GetComponent<Singleton>().dealDamage(inventory.getToolPower());
+        do {
+            if (checkDestroyRay() && canMine && inventory.checkItemFunction(0)) // && inv.getObjName() == "picaxe_wood")
+            {
+                // See Singleton.cs for more details on dealDamage()
+                currentSingleton.GetComponent<Singleton>().dealDamage(inventory.getToolPower());
+                yield return new WaitForSeconds(0.2f);
+                yield return null;
+            }
+        } while (Input.GetButton("Fire2"));
+        yield return new WaitForSeconds(0.2f);
+    }
+
+    public bool checkDestroyRay() {
+        float raySize = 0.1f;
+        templateObjPos = templateObject.transform.position;
+
+        Vector2 origin = new Vector2(templateObjCol.bounds.center.x, templateObjCol.bounds.center.y);
+        RaycastHit2D outRay = Physics2D.Raycast(origin, Vector2.up, raySize, 1 << buildLayerMask);
+
+        Debug.DrawRay(origin, Vector2.up * raySize, Color.yellow);
+
+        if(outRay.collider != null) {
+            currentSingleton = outRay.collider.gameObject;
+            return true;
         }
+        return false;
     }
 
     public void checkRays()
     {
         templateObjPos = templateObject.transform.position;
-        outRays = new RaycastHit2D[10];
+        RaycastHit2D[] outRays = new RaycastHit2D[10];
         Vector2[] origin = new Vector2[9];
         float raySize = 0.1f;
         float skinWidth = 0.015f;

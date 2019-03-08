@@ -78,9 +78,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c78d41e718c486447951ddf3fa736a0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scriptObj: {fileID: 11400000, guid: 98310df56ab90cb4db1215f1138866c1, type: 2}
+  blockObj: {fileID: 11400000, guid: 98310df56ab90cb4db1215f1138866c1, type: 2}
   sprRend: {fileID: 0}
   col2D: {fileID: 0}
+  destroyed: 0
 --- !u!212 &212194412161054228
 SpriteRenderer:
   m_ObjectHideFlags: 1
